@@ -1,0 +1,128 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* newNode(int x) {
+    Node* n = new Node();
+    n->data = x;
+    n->left = n->right = NULL;
+    return n;
+}
+
+/* INSERT */
+Node* insert(Node* root, int x) {
+    if (root == NULL)
+        return newNode(x);
+
+    if (x < root->data)
+        root->left = insert(root->left, x);
+    else
+        root->right = insert(root->right, x);
+
+    return root;
+}
+
+/* SEARCH */
+bool search(Node* root, int key) {
+    if (root == NULL) return false;
+    if (root->data == key) return true;
+
+    if (key < root->data)
+        return search(root->left, key);
+    else
+        return search(root->right, key);
+}
+
+/* FIND MIN (for deletion) */
+Node* findMin(Node* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+/* DELETE */
+Node* deleteNode(Node* root, int key) {
+    if (root == NULL) return root;
+
+    if (key < root->data)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->data)
+        root->right = deleteNode(root->right, key);
+    else {
+        if (root->left == NULL)
+            return root->right;
+        else if (root->right == NULL)
+            return root->left;
+
+        Node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+    return root;
+}
+
+/* TRAVERSALS */
+void inorder(Node* root) {
+    if (root == NULL) return;
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
+}
+
+void preorder(Node* root) {
+    if (root == NULL) return;
+    cout << root->data << " ";
+    preorder(root->left);
+    preorder(root->right);
+}
+
+void postorder(Node* root) {
+    if (root == NULL) return;
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->data << " ";
+}
+
+int main() {
+    Node* root = NULL;
+    int n, x, key;
+
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    cout << "Enter values:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> x;
+        root = insert(root, x);
+    }
+
+    cout << "\nInorder: ";
+    inorder(root);
+
+    cout << "\nPreorder: ";
+    preorder(root);
+
+    cout << "\nPostorder: ";
+    postorder(root);
+
+    cout << "\n\nEnter element to search: ";
+    cin >> key;
+    if (search(root, key))
+        cout << "Element found";
+    else
+        cout << "Element not found";
+
+    cout << "\n\nEnter element to delete: ";
+    cin >> key;
+    root = deleteNode(root, key);
+
+    cout << "Inorder after deletion: ";
+    inorder(root);
+
+    return 0;
+}
